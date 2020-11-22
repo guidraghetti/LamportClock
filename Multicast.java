@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Multicast {
@@ -11,7 +10,6 @@ public class Multicast {
     private static Boolean receiver = false;
     private static int porta;
     private static InetAddress grupo;
-    private static ArrayList<String> listOfReceiverVotes = new ArrayList<String>();
     private static Boolean condition = true;
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -46,44 +44,39 @@ public class Multicast {
     public static void creator(MulticastSocket socket) throws InterruptedException {
         ReadConfigFile configFile = new ReadConfigFile();
         configFile.readConfigAddToList();
+        System.out.println("Estou pronto, vou esperar os outros");
+        Scanner in = new Scanner(System.in);
+        String verifyMessage = in.nextLine();
+        System.out.println("Digite 'verify' após inicializar todos os processos para a inicialização multicast");
         try {
-            Thread.sleep(20000);
-
-            byte[] requestlistOfReceiverVotes = new byte[1024];
-            requestlistOfReceiverVotes = "request".getBytes();
-            DatagramPacket data = new DatagramPacket(requestlistOfReceiverVotes, requestlistOfReceiverVotes.length,
-                    grupo, porta);
-            socket.send(data);
-            System.out.println(configFile.getNOfProcess()-1);
-            for (int i = 0; i < configFile.getNOfProcess() - 1; i++) {
-                byte[] received = new byte[1024];
-                DatagramPacket dataVote = new DatagramPacket(received, received.length);
-
+            int i = 0;
+            if (verifyMessage.equalsIgnoreCase("verify")) {
+                byte[] verify = new byte[1024];
+                verify = verifyMessage.getBytes();
+                DatagramPacket sendVerify = new DatagramPacket(verify, verify.length, grupo, porta);
+                socket.send(sendVerify);
+            }
+            while (i < configFile.getNOfProcess() - 1) {
+                byte[] receivedOk = new byte[1024];
+                DatagramPacket processReady = new DatagramPacket(receivedOk, receivedOk.length);
                 try {
-                    socket.receive(dataVote);
-                } catch (Exception ex) {
-                    System.out.println("TimedOut!");
+                    socket.receive(processReady);
+                    i++;
+                } catch (Exception e) {
                     condition = false;
                     break;
                 }
-
-                String vote = new String(dataVote.getData(), 0, dataVote.getLength());
-
-                if (!vote.equalsIgnoreCase("request")) {
-                    listOfReceiverVotes.add(vote);
-                }
-
                 Thread.sleep(2000);
             }
-
-            byte[] commitMessage = new byte[1024];
-            commitMessage = "global_commit".getBytes();
-            DatagramPacket sendGlobalCommit = new DatagramPacket(commitMessage, commitMessage.length, grupo, porta);
-
-            socket.send(sendGlobalCommit);
+            byte[] startLocalsClock = new byte[1024];
+            startLocalsClock = "start".getBytes();
+            DatagramPacket sendStartCommand = new DatagramPacket(startLocalsClock, startLocalsClock.length, grupo,
+                    porta);
+            socket.send(sendStartCommand);
             condition = false;
 
-        } catch (IOException e) {
+        } catch (Exception e) {
+
         }
     }
 
@@ -92,34 +85,32 @@ public class Multicast {
         configFile.readConfigAddToList();
         try {
             if (receiver) {
-                byte[] sendVote = new byte[1024];
-                String generatedVote = "ready";
-                System.out.println("SendVote");
-                sendVote = generatedVote.getBytes();
-                DatagramPacket data = new DatagramPacket(sendVote, sendVote.length, grupo, porta);
-
-                socket.send(data);
-                Thread.sleep(2000);
+                System.out.println("Estou pronto");
+                byte[] sendOk = new byte[1024];
+                sendOk = "ready".getBytes();
+                DatagramPacket sendReady = new DatagramPacket(sendOk, sendOk.length, grupo, porta);
+                socket.send(sendReady);
                 receiver = false;
             }
 
-            byte[] receiveData = new byte[1024];
-            DatagramPacket data = new DatagramPacket(receiveData, receiveData.length);
-            socket.receive(data);
+            byte[] response = new byte[1024];
+            DatagramPacket res = new DatagramPacket(response, response.length);
+            socket.receive(res);
 
-            String voterResponse = new String(data.getData(), 0, data.getLength());
+            String responseData = new String(res.getData(), 0, res.getLength());
 
-            if (voterResponse.equalsIgnoreCase("request")) {
+            if (responseData.equals("verify")) {
                 receiver = true;
             }
 
-            if (voterResponse.equalsIgnoreCase("global_commit")) {
-                // Lamport lamport = new Lamport();
-                System.out.println("Chegou na hora de inicializar");
-                condition = false;
+            if (responseData.equals("start")) {
+                System.out.println("Que comecem os jogos");
             }
-        } catch (IOException e) {
+
+        } catch (Exception e) {
+
         }
 
     }
+
 }
