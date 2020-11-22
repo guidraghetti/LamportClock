@@ -8,9 +8,10 @@ public class Multicast {
 
     private static Boolean creator = false;
     private static Boolean receiver = false;
-    private static int porta;
-    private static InetAddress grupo;
+    private static int port;
+    private static InetAddress group;
     private static Boolean condition = true;
+    private static int numberOfMyProcess;
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
@@ -18,12 +19,12 @@ public class Multicast {
             System.out.println("Você precisa indicar qual a linha do arquivo de configuração é o seu processo");
             System.exit('1');
         }
-        System.out.println(args[0]);
-        porta = 3001;
-        MulticastSocket socket = new MulticastSocket(porta);
+        numberOfMyProcess = Integer.parseInt(args[0]);
+        port = 3001;
+        MulticastSocket socket = new MulticastSocket(port);
         socket.setSoTimeout(500);
-        grupo = InetAddress.getByName("224.0.0.0");
-        socket.joinGroup(grupo);
+        group = InetAddress.getByName("224.0.0.0");
+        socket.joinGroup(group);
         String nick = args[1];
 
         if (nick.equalsIgnoreCase("server")) {
@@ -37,7 +38,7 @@ public class Multicast {
                 receiver(socket);
         }
 
-        socket.leaveGroup(grupo);
+        socket.leaveGroup(group);
         socket.close();
     }
 
@@ -45,15 +46,15 @@ public class Multicast {
         ReadConfigFile configFile = new ReadConfigFile();
         configFile.readConfigAddToList();
         System.out.println("Estou pronto, vou esperar os outros");
+        System.out.println("Digite 'verify' após inicializar todos os processos para a inicialização multicast");
         Scanner in = new Scanner(System.in);
         String verifyMessage = in.nextLine();
-        System.out.println("Digite 'verify' após inicializar todos os processos para a inicialização multicast");
         try {
             int i = 0;
             if (verifyMessage.equalsIgnoreCase("verify")) {
                 byte[] verify = new byte[1024];
                 verify = verifyMessage.getBytes();
-                DatagramPacket sendVerify = new DatagramPacket(verify, verify.length, grupo, porta);
+                DatagramPacket sendVerify = new DatagramPacket(verify, verify.length, group, port);
                 socket.send(sendVerify);
             }
             while (i < configFile.getNOfProcess() - 1) {
@@ -70,14 +71,17 @@ public class Multicast {
             }
             byte[] startLocalsClock = new byte[1024];
             startLocalsClock = "start".getBytes();
-            DatagramPacket sendStartCommand = new DatagramPacket(startLocalsClock, startLocalsClock.length, grupo,
-                    porta);
+            DatagramPacket sendStartCommand = new DatagramPacket(startLocalsClock, startLocalsClock.length, group,
+                    port);
             socket.send(sendStartCommand);
             condition = false;
+            System.out.println("Iniciando relógio...");
+            Lamport localClock = new Lamport(numberOfMyProcess);
 
         } catch (Exception e) {
 
         }
+        in.close();
     }
 
     public static void receiver(MulticastSocket socket) throws InterruptedException {
@@ -88,7 +92,7 @@ public class Multicast {
                 System.out.println("Estou pronto");
                 byte[] sendOk = new byte[1024];
                 sendOk = "ready".getBytes();
-                DatagramPacket sendReady = new DatagramPacket(sendOk, sendOk.length, grupo, porta);
+                DatagramPacket sendReady = new DatagramPacket(sendOk, sendOk.length, group, port);
                 socket.send(sendReady);
                 receiver = false;
             }
@@ -104,7 +108,9 @@ public class Multicast {
             }
 
             if (responseData.equals("start")) {
-                System.out.println("Que comecem os jogos");
+                System.out.println("Iniciando relógio...");
+                Lamport localClock = new Lamport(numberOfMyProcess);
+
             }
 
         } catch (Exception e) {
