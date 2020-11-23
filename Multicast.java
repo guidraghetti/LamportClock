@@ -77,6 +77,7 @@ public class Multicast {
             condition = false;
             System.out.println("Iniciando relógio...");
             Lamport localClock = new Lamport(numberOfMyProcess);
+            localClock.start();
 
         } catch (Exception e) {
 
@@ -110,6 +111,7 @@ public class Multicast {
             if (responseData.equals("start")) {
                 System.out.println("Iniciando relógio...");
                 Lamport localClock = new Lamport(numberOfMyProcess);
+                localClock.start();
 
             }
 
