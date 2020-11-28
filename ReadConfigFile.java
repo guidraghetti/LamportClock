@@ -15,12 +15,12 @@ public class ReadConfigFile {
         try {
             File myObj = new File("config.txt");
             Scanner myReader = new Scanner(myObj);
-            while (myReader.hasNextLine()) {
-                String[] pArray = myReader.nextLine().split((" "));
+            while (myReader.hasNextLine()) {                
+                String[] pArray = myReader.nextLine().split((" "));                
                 Process process = new Process(Integer.parseInt(pArray[0]), pArray[1], Integer.parseInt(pArray[2]),
                         Double.parseDouble(pArray[3]));
-                listOfProcess.add(process);
-            }
+                listOfProcess.add(process);                
+            }            
             this.nOfProcces = listOfProcess.size();
             myReader.close();
         } catch (FileNotFoundException e) {

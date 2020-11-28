@@ -9,10 +9,11 @@ public class Lamport {
     private int localTimeStamp = 0;
     private int counter = 0;
 
-    ReadConfigFile readFile = new ReadConfigFile();
+    ReadConfigFile readFile = new ReadConfigFile();    
 
     public Lamport(int numberOfMyProcess) {
         this.numberOfMyProcess = numberOfMyProcess;
+        readFile.readConfigAddToList(); 
     }
 
     public void createEvent() throws InterruptedException {
@@ -58,8 +59,8 @@ public class Lamport {
 
     public void chooseTypeOfEvent() {
         System.out.println("Chegou no chooseTypeOfEvent");
-        int random = 1 + (int) (Math.random() * ((100 - 1) + 1));
-        double chance = myProcess.chance * 100;
+        int random = 1 + (int) (Math.random() * ((100 - 1) + 1));        
+        double chance = myProcess.chance * 100;        
         if (random > chance) {
             localEvent();
         } else {
@@ -103,7 +104,7 @@ public class Lamport {
         myProcess = readFile.getIndexListOfProcess(numberOfMyProcess);
         System.out.println("My PROCEES ID:  " + myProcess.id);
         try {
-            listener();
+            //listener();
             createEvent();
         } catch (Exception e) {
 

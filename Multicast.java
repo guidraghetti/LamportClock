@@ -18,8 +18,8 @@ public class Multicast {
         if (args.length < 1) {
             System.out.println("Você precisa indicar qual a linha do arquivo de configuração é o seu processo");
             System.exit('1');
-        }
-        numberOfMyProcess = Integer.parseInt(args[0]);
+        }        
+        numberOfMyProcess = Integer.parseInt(args[0]);        
         port = 3001;
         MulticastSocket socket = new MulticastSocket(port);
         socket.setSoTimeout(500);
@@ -44,7 +44,7 @@ public class Multicast {
 
     public static void creator(MulticastSocket socket) throws InterruptedException {
         ReadConfigFile configFile = new ReadConfigFile();
-        configFile.readConfigAddToList();
+        configFile.readConfigAddToList();        
         System.out.println("Estou pronto, vou esperar os outros");
         System.out.println("Digite 'verify' após inicializar todos os processos para a inicialização multicast");
         Scanner in = new Scanner(System.in);
@@ -87,7 +87,7 @@ public class Multicast {
 
     public static void receiver(MulticastSocket socket) throws InterruptedException {
         ReadConfigFile configFile = new ReadConfigFile();
-        configFile.readConfigAddToList();
+        configFile.readConfigAddToList();        
         try {
             if (receiver) {
                 System.out.println("Estou pronto");
