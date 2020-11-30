@@ -53,9 +53,7 @@ public class Lamport {
                 DatagramSocket socket = new DatagramSocket(myProcess.port);
                 DatagramPacket packet;
                 byte[] data = new byte[1024];
-                System.out.println("Thead1");
                 while (true) {
-                    System.out.println("Thread2");
                     try {
                         packet = new DatagramPacket(data, data.length);
                         socket.setSoTimeout(500);
