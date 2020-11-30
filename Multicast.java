@@ -25,7 +25,13 @@ public class Multicast {
         socket.setSoTimeout(500);
         group = InetAddress.getByName("224.0.0.0");
         socket.joinGroup(group);
-        String nick = args[1];
+        String nick = "";
+        if (args.length < 2) {
+            nick = "";
+        }
+        else {
+            nick = args[1];
+        }
 
         if (nick.equalsIgnoreCase("server")) {
             creator = true;

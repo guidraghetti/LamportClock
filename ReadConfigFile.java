@@ -39,7 +39,6 @@ public class ReadConfigFile {
     }
 
     public Process getIndexListOfProcess(int index) {
-        System.out.println("Entrou getIndexListOfProcess");
         return this.listOfProcess.get(index);
     }
 
