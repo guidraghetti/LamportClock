@@ -1,7 +1,5 @@
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.util.List;
 import java.net.DatagramSocket;
 
 public class Lamport {
@@ -42,9 +40,8 @@ public class Lamport {
         localTimeStamp += 1;
         String concatLocalTimeStamp = "" + localTimeStamp + myProcess.id;
         localTimeStamp = Integer.parseInt(concatLocalTimeStamp);
-        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " +
-        localTimeStamp + " " + receivedId
-        + " " + receivedTimeStamp);
+        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + localTimeStamp + " " + receivedId
+                + " " + receivedTimeStamp);
         // System.out.println("RECEIVE EVENT");
     }
 
@@ -95,8 +92,7 @@ public class Lamport {
     public void localEvent() {
         localTimeStamp += 1;
         String concatLocalTimeStamp = localTimeStamp + myProcess.id + "";
-        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " +
-        concatLocalTimeStamp);
+        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + concatLocalTimeStamp);
         // System.out.println("LOCAL EVENT");
         return;
 
@@ -116,16 +112,14 @@ public class Lamport {
             socket.send(sendData);
             socket.close();
             String concatLocalTimeStamp = localTimeStamp + myProcess.id + "";
-            System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " +
-            concatLocalTimeStamp + " "
-            + otherProcess.id);
+            System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + concatLocalTimeStamp + " "
+                    + otherProcess.id);
 
         } catch (Exception e) {
             System.out.println("Erro \n\n\n");
             e.printStackTrace();
         }
 
-    
         // System.out.println("SEND EVENT");
         return;
 
