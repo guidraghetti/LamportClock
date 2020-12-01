@@ -1,5 +1,6 @@
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.DatagramSocket;
 
 public class Lamport {
@@ -7,7 +8,7 @@ public class Lamport {
     private int numberOfMyProcess;
     private int localTimeStamp = 0;
     private int counter = 0;
-
+    private DatagramSocket socket;
     ReadConfigFile readFile = new ReadConfigFile();
 
     public Lamport(int numberOfMyProcess) {
@@ -40,7 +41,7 @@ public class Lamport {
         localTimeStamp += 1;
         String concatLocalTimeStamp = "" + localTimeStamp + myProcess.id;
         localTimeStamp = Integer.parseInt(concatLocalTimeStamp);
-        System.out.println("Received:" + System.currentTimeMillis() + " " + myProcess.id + " " + localTimeStamp + " " + receivedId
+        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + localTimeStamp + " " + receivedId
                 + " " + receivedTimeStamp);
         // System.out.println("RECEIVE EVENT");
     }
@@ -50,7 +51,6 @@ public class Lamport {
         public void run() {
             try {
 
-                DatagramSocket socket = new DatagramSocket(myProcess.port);
                 DatagramPacket packet;
                 byte[] data = new byte[1024];
                 while (true) {
@@ -62,8 +62,6 @@ public class Lamport {
                         String[] msgAndClock = response.split(":");
                         calcLamport(msgAndClock);
                     } catch (Exception e) {
-                        socket.close();
-                        break;
                     }
                 }
 
@@ -105,10 +103,8 @@ public class Lamport {
             InetAddress host = InetAddress.getByName(otherProcess.host);
             DatagramPacket sendData = new DatagramPacket(sendMessageAndLocalClock, sendMessageAndLocalClock.length,
                     host, otherProcess.port);
-            DatagramSocket socket = new DatagramSocket(myProcess.port);
 
             socket.send(sendData);
-            socket.close();
             String concatLocalTimeStamp = localTimeStamp + myProcess.id + "";
             System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + concatLocalTimeStamp + " "
                     + otherProcess.id);
@@ -126,6 +122,12 @@ public class Lamport {
     public void getMyProcess() {
         myProcess = readFile.getIndexListOfProcess(numberOfMyProcess);
         System.out.println("My PROCEES ID:  " + myProcess.id);
+        try {
+            socket = new DatagramSocket(myProcess.port);
+        } catch (SocketException e) {
+            System.out.println("Unable to start Server");
+            System.exit(1);
+        }
         listener.start();
         createEvent.start();
         while (true) {
