@@ -34,6 +34,10 @@ public class Lamport {
         }
     });
 
+//     Recebimento de mensagem: m i c r s t, onde onde m é o tempo do computador
+// local em milissegundos, i é o ID do nodo local, c é o valor do relógio lógico
+// depois do recebimento da mensagem, s é ID do nodo remetente da mensagem, t
+// é o valor do relógio lógico recebido com a mensagem.
     public void calcLamport(String[] data) {
         int receivedTimeStamp = Integer.parseInt(data[2]);
         int receivedId = Integer.parseInt(data[1]);
@@ -41,7 +45,7 @@ public class Lamport {
         localTimeStamp += 1;
         String concatLocalTimeStamp = "" + localTimeStamp + myProcess.id;
         localTimeStamp = Integer.parseInt(concatLocalTimeStamp);
-        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + localTimeStamp + " " + receivedId
+        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + localTimeStamp + " r " + receivedId
                 + " " + receivedTimeStamp);
         // System.out.println("RECEIVE EVENT");
     }
@@ -88,7 +92,7 @@ public class Lamport {
     public void localEvent() {
         localTimeStamp += 1;
         String concatLocalTimeStamp = localTimeStamp + myProcess.id + "";
-        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + concatLocalTimeStamp);
+        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + concatLocalTimeStamp + " l");
         // System.out.println("LOCAL EVENT");
         return;
 
@@ -107,7 +111,7 @@ public class Lamport {
             socket.send(sendData);
             String concatLocalTimeStamp = localTimeStamp + myProcess.id + "";
             System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + concatLocalTimeStamp + " "
-                    + otherProcess.id);
+                  + " s "  + otherProcess.id);
 
         } catch (Exception e) {
             System.out.println("Erro \n\n\n");
