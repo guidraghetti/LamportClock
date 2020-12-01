@@ -40,8 +40,7 @@ public class Lamport {
         localTimeStamp = Math.max(localTimeStamp, receivedTimeStamp);
         localTimeStamp += 1;
         String concatLocalTimeStamp = "" + localTimeStamp + myProcess.id;
-        localTimeStamp = Integer.parseInt(concatLocalTimeStamp);
-        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + localTimeStamp + " r " + receivedId
+        System.out.println(System.currentTimeMillis() + " " + myProcess.id + " " + concatLocalTimeStamp + " r " + receivedId
                 + " " + receivedTimeStamp);
         // System.out.println("RECEIVE EVENT");
     }
